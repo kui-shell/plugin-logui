@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 IBM Corporation
+ * Copyright 2019 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-import { isHeadless } from '@kui-shell/core/api/capabilities'
 import { isKubeResource } from '@kui-shell/plugin-kubeui'
 
-export default async () => {
-  if (!isHeadless()) {
-    const { registerMode } = await import('@kui-shell/core/api/registrars')
-    registerMode({
-      when: isKubeResource,
-      mode: {
-        mode: 'hello',
-        content: 'some string content'
-      }
-    })
+export default {
+  when: isKubeResource,
+  mode: {
+    mode: 'demo1',
+    content: 'some string content'
   }
 }

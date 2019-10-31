@@ -14,5 +14,15 @@
  * limitations under the License.
  */
 
-// this file defines the external API
+import { isHeadless } from '@kui-shell/core/api/capabilities'
 
+import hello from './modes/hello'
+import lastApplied from './modes/last-applied'
+
+export default async () => {
+  if (!isHeadless()) {
+    const { registerMode } = await import('@kui-shell/core/api/registrars')
+    registerMode(hello)
+    registerMode(lastApplied)
+  }
+}
