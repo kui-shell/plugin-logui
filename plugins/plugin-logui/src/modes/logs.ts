@@ -18,15 +18,11 @@ import { Tab } from '@kui-shell/core/api/ui-lite'
 import { Table } from '@kui-shell/core/api/table-models'
 import { doExecRaw, KubeResource, isJob, isDeployment, isPod } from '@kui-shell/plugin-kubeui'
 
-type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR'
+import { LogEntry } from './entry'
 
-interface LogEntry {
-  level: LogLevel
-  timestamp?: string
-  detail1?: string
-  detail2?: string
-  message: string
-}
+import nginx from '../formats/nginx'
+import zapr from '../formats/zapr'
+import plain from '../formats/plain'
 
 interface LogParser {
   pattern: RegExp
@@ -34,47 +30,7 @@ interface LogParser {
   entry(match: string[]): LogEntry
 }
 
-// 10.73.230.207 - - [04/Nov/2019:14:19:31 +0000] "GET / HTTP/1.1" 200 396 "-" "kube-probe/1.15"
-const nginx = {
-  pattern: /^(\d+.\d+.\d+.\d+) - (\w*)- \[(\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} [+-]\d{4})\] "(\w+) (\S+) (\S+)" (\d+) (\d+) "(\S+)" "(.+)"$/m,
-  nColumns: 11,
-  entry: (match: string[]): LogEntry => {
-    return {
-      level: parseInt(match[7], 10) < 400 ? 'INFO' : 'ERROR',
-      timestamp: match[3],
-      detail1: match[7],
-      detail2: match[4],
-      message: [match[1], match[2], match[6], match[8], match[9], match[10]].join(' ')
-    }
-  }
-}
-
-const zapr = {
-  pattern: /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+Z)\s+(DEBUG|INFO|ERROR)\s+([^\s]+)\s+([^\s]+)\s+(.*)$/m,
-  nColumns: 6,
-  entry: (match: string[]): LogEntry => {
-    return {
-      level: match[2] as LogLevel,
-      timestamp: match[1],
-      detail1: match[3],
-      detail2: match[4],
-      message: match[5]
-    }
-  }
-}
-
-const newline = {
-  pattern: /\n/,
-  nColumns: 1,
-  entry: (match: string[]): LogEntry => {
-    return {
-      level: 'INFO',
-      message: match[0]
-    }
-  }
-}
-
-const formats = [nginx, zapr, newline]
+const formats = [nginx, zapr, plain]
 
 const tryParse = (raw: string) => (fmt: LogParser) => {
   const logLines = raw.split(fmt.pattern)
