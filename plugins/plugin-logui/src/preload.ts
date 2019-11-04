@@ -16,13 +16,11 @@
 
 import { isHeadless } from '@kui-shell/core/api/capabilities'
 
-import hello from './modes/hello'
-import lastApplied from './modes/last-applied'
+import logs from './modes/logs'
 
 export default async () => {
   if (!isHeadless()) {
     const { registerMode } = await import('@kui-shell/core/api/registrars')
-    registerMode(hello)
-    registerMode(lastApplied)
+    registerMode(logs)
   }
 }
