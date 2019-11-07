@@ -22,4 +22,5 @@ export interface LogEntry {
   detail1?: string
   detail2?: string
   message: string
+  messageDetail?: Record<string, any> // eslint-disable-lint @typescript-eslint/no-explicit-any
 }
