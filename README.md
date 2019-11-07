@@ -1,14 +1,16 @@
-# Boilerplate for extending the kubectl with graphics
+# Log Visualization plugin for Kui
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-This project provides the boilerplate to extend kubectl with visual
-capabilities.
+This project adds log visualization support to kubectl, using the
+[Kui](https://github.com/IBM/kui) tool framework. It leverages the
+[kubeui](https://github.com/kui-shell/plugin-kubeui) plugin for core
+Kubernetes visulizations.
 
 # Clone and Own the Repo
 
 ```bash
-git clone https://github.com/kui-shell/plugin-kubectl-boilerplate && cd plugin-kubectl-boilerplate
+git clone https://github.com/kui-shell/plugin-logui && cd plugin-logui
 npm ci
 npm start
 ```
@@ -18,9 +20,10 @@ You should see a window come up. You can now try, for example,
 in response.
 
 As described [below](#webpack), you may also develop against a
-browser. For example, here is the kubeui plugin running as a
-[webpack](https://webpack.js.org/) client in Firefox: ![kubeui running
-in firefox](docs/kubeui-firefox.png)
+browser. For example, here is the
+[kubeui](https://github.com/kui-shell/plugin-kubeui) plugin running as
+a [webpack](https://webpack.js.org/) client in Firefox: ![kubeui
+running in firefox](docs/kubeui-firefox.png)
 
 # How this Project extends Kui
 
@@ -74,7 +77,7 @@ This is the layout of a Kui project:
 
 ```
 ├── plugins/
-│   └── plugin-kubeui/
+│   └── plugin-logui/
 ├── theme/
 │   ├── css/
 │   ├── icons/
