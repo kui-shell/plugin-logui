@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-import { isHeadless } from '@kui-shell/core/api/capabilities'
+export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR'
 
-import logs from './modes/logs'
-import previous from './modes/previous'
-import drilldownToLogs from './modes/show-logs'
+export interface LogEntry {
+  level: LogLevel
+  timestamp?: string
 
-export default async () => {
-  if (!isHeadless()) {
-    const { registerMode } = await import('@kui-shell/core/api/registrars')
-    registerMode(logs)
-    registerMode(previous)
-    registerMode(drilldownToLogs)
-  }
+  detail1Key?: string
+  detail1?: string
+
+  detail2Key?: string
+  detail2?: string
+
+  message: string
+  messageDetail?: Record<string, any> // eslint-disable-line @typescript-eslint/no-explicit-any
 }

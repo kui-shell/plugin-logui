@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import { isHeadless } from '@kui-shell/core/api/capabilities'
+import Commands from '@kui-shell/core/api/commands'
+import { KubeOptions, doExecRaw, defaultFlags as flags } from '@kui-shell/plugin-kubeui'
 
-import logs from './modes/logs'
-import previous from './modes/previous'
-import drilldownToLogs from './modes/show-logs'
+import commandPrefix from '../command-prefix'
+import { formatAsTable } from '../../renderers/table'
 
-export default async () => {
-  if (!isHeadless()) {
-    const { registerMode } = await import('@kui-shell/core/api/registrars')
-    registerMode(logs)
-    registerMode(previous)
-    registerMode(drilldownToLogs)
-  }
+async function doLogs(args: Commands.Arguments<KubeOptions>) {
+  return formatAsTable(await doExecRaw(args.command.replace(new RegExp(`^\\s*${commandPrefix}`), '')), args)
+}
+
+export default (registrar: Commands.Registrar) => {
+  registrar.listen(`/${commandPrefix}/kubectl/logs`, doLogs, flags)
+  registrar.listen(`/${commandPrefix}/k/logs`, doLogs, flags)
 }

@@ -15,9 +15,11 @@
  */
 
 import { i18n } from '@kui-shell/core/api/i18n'
-import { KubeResource } from '@kui-shell/plugin-kubeui'
+import { Tab } from '@kui-shell/core/api/ui-lite'
+import { Table } from '@kui-shell/core/api/table-models'
+import { doExecRaw, KubeResource } from '@kui-shell/plugin-kubeui'
 
-import renderLogs from '../renderers/table'
+import { formatAsTable } from '../renderers/table'
 
 const strings = i18n('plugin-logui')
 
@@ -30,15 +32,26 @@ function isLogs(resource: KubeResource): boolean {
 }
 
 /**
- * This is our mode model for the Logs tab of a Logs resource
+ * Unlike for the `logs` mode, we don't yet have the data for the
+ * `previous` mode. Thus, we first fetch it (by modifying the
+ * `originatingCommand` to add `--previous`), and then pass that raw
+ * logs data to `formatAsTable`. That function gives us back a Table.
+ *
+ */
+async function renderPrevious(tab: Tab, resource: KubeResource): Promise<Table> {
+  return formatAsTable(await doExecRaw(`${resource.originatingCommand} --previous`))
+}
+
+/**
+ * This is our mode model for the Previous tab of a Logs resource
  *
  */
 export default {
   when: isLogs,
   mode: {
-    mode: 'logs',
-    label: strings('Logs'),
-    content: renderLogs,
+    mode: 'previous',
+    label: strings('Previous'),
+    content: renderPrevious,
     priority: 10
   }
 }

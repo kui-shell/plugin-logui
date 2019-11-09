@@ -21,7 +21,10 @@
  *
  */
 
-import { LogEntry, LogLevel } from '../modes/entry'
+import { i18n } from '@kui-shell/core/api/i18n'
+import { LogEntry, LogLevel } from '../models/entry'
+
+const strings = i18n('plugin-kubeui')
 
 export default {
   entry: (line: string): LogEntry => {
@@ -38,6 +41,7 @@ export default {
         level: record.level.toUpperCase() as LogLevel,
         timestamp: new Date(1000 * parseFloat(record.ts)).toLocaleString(),
         detail1: record.logger,
+        detail1Key: strings('Logger'),
         message: record.msg,
         messageDetail: Object.keys(rest).length > 0 ? rest : {}
       }
