@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { LogEntry, LogLevel } from '../modes/entry'
+import { LogEntry, LogLevel } from '../models/entry'
 
 export default {
   pattern: /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+Z)\s+(DEBUG|INFO|ERROR)\s+([^\s]+)\s+([^\s]+)\s+(.*)$/m,

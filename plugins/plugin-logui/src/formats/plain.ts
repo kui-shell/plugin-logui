@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { LogEntry } from '../modes/entry'
+import { LogEntry } from '../models/entry'
 
 export default {
   pattern: /\n/,

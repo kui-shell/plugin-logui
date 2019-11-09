@@ -21,7 +21,7 @@
  *
  */
 
-import { LogEntry } from '../modes/entry'
+import { LogEntry } from '../models/entry'
 
 export default {
   pattern: /^(\d+.\d+.\d+.\d+) - (\w*)- \[(\d{2}\/\w{3}\/\d{4}:\d{2}:\d{2}:\d{2} [+-]\d{4})\] "(\w+) (\S+) (\S+)" (\d+) (\d+) "(\S+)" "(.+)"$/m,
@@ -31,7 +31,9 @@ export default {
       level: parseInt(match[7], 10) < 400 ? 'INFO' : 'ERROR',
       timestamp: match[3],
       detail1: match[7],
+      detail1Key: 'status',
       detail2: match[4],
+      detail2Key: 'method',
       message: [match[1], match[2], match[6], match[8], match[9], match[10]].join(' ')
     }
   }

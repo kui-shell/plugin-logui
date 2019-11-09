@@ -14,13 +14,4 @@
  * limitations under the License.
  */
 
-export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR'
-
-export interface LogEntry {
-  level: LogLevel
-  timestamp?: string
-  detail1?: string
-  detail2?: string
-  message: string
-  messageDetail?: Record<string, any> // eslint-disable-lint @typescript-eslint/no-explicit-any
-}
+export default 'github.com/kui-shell/plugin-logui/v1alpha1'

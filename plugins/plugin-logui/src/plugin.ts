@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-/*
 import Commands from '@kui-shell/core/api/commands'
 
-export default async (commandTree: Commands.Registrar) => {}
- */
+import logs from './controller/kubectl/logs'
+
+export default async (registrar: Commands.Registrar) => {
+  await logs(registrar)
+}
