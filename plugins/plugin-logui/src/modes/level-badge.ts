@@ -14,31 +14,19 @@
  * limitations under the License.
  */
 
-import { i18n } from '@kui-shell/core/api/i18n'
-import { KubeResource } from '@kui-shell/plugin-kubeui'
+import { BadgeRegistration } from '@kui-shell/core/api/registrars'
 
-import renderLogs from '../renderers/table'
+import { LogEntryResource, isLogEntryResource } from '../models/resource'
 
-const strings = i18n('plugin-logui')
-
-/**
- * @return whether the given resource represents a list of logs
- *
- */
-function isLogs(resource: KubeResource): boolean {
-  return resource.kind === 'logs'
-}
-
-/**
- * This is our mode model for the Logs tab of a Logs resource
- *
- */
-export default {
-  when: isLogs,
-  mode: {
-    mode: 'logs',
-    label: strings('Logs'),
-    content: renderLogs,
-    priority: 10
+const levelBadge: BadgeRegistration<LogEntryResource> = {
+  when: isLogEntryResource,
+  badge: (resource: LogEntryResource) => {
+    const level = resource.spec.entry.level
+    return {
+      title: level,
+      css: level === 'WARN' ? 'yellow-background' : level === 'ERROR' ? 'red-background' : undefined
+    }
   }
 }
+
+export default levelBadge
