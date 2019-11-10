@@ -18,13 +18,16 @@ import { isHeadless } from '@kui-shell/core/api/capabilities'
 
 import logs from './modes/logs'
 import previous from './modes/previous'
+import levelBadge from './modes/level-badge'
 import drilldownToLogs from './modes/show-logs'
 
 export default async () => {
   if (!isHeadless()) {
-    const { registerMode } = await import('@kui-shell/core/api/registrars')
+    const { registerBadge, registerMode } = await import('@kui-shell/core/api/registrars')
     registerMode(logs)
     registerMode(previous)
     registerMode(drilldownToLogs)
+
+    registerBadge(levelBadge)
   }
 }

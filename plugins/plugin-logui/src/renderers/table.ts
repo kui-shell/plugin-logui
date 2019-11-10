@@ -14,24 +14,15 @@
  * limitations under the License.
  */
 
-import { safeDump } from 'js-yaml'
-
 import { i18n } from '@kui-shell/core/api/i18n'
 import { Tab, MultiModalResponse } from '@kui-shell/core/api/ui-lite'
 import { Table, Cell } from '@kui-shell/core/api/table-models'
 import Commands from '@kui-shell/core/api/commands'
 
-import {
-  KubeOptions,
-  getNamespace,
-  KubeResource,
-  KubeResourceWithSummary,
-  InvolvedObject
-} from '@kui-shell/plugin-kubeui'
+import { KubeOptions, getNamespace, KubeResource, InvolvedObject } from '@kui-shell/plugin-kubeui'
 
 import { LogEntry } from '../models/entry'
-
-import apiVersion from '../controller/kubectl/apiVersion'
+import { LogEntryResource, resourceFromLogEntry } from '../models/resource'
 
 // here are the known log parsers
 import json from '../formats/json'
@@ -108,10 +99,10 @@ function formatLevel(entry: LogEntry): string {
  * onclick
  *
  */
-function showLogEntry(
+async function showLogEntry(
   logLine: LogEntry,
-  { involvedObject }: InvolvedObject
-): MultiModalResponse<KubeResourceWithSummary & InvolvedObject> {
+  involvedObject: InvolvedObject
+): Promise<MultiModalResponse<LogEntryResource>> {
   const modes = logLine.messageDetail
     ? [
         {
@@ -123,34 +114,20 @@ function showLogEntry(
       ]
     : []
 
-  return {
-    apiVersion,
-    kind: 'log entry',
-    isSimulacrum: true,
-    originatingCommand: undefined,
-    metadata: {
-      name: involvedObject.name,
-      namespace: involvedObject.namespace
-    },
+  return Object.assign(await resourceFromLogEntry(logLine, involvedObject), {
     toolbarText: {
-      type:
-        logLine.level === 'DEBUG' || logLine.level === 'INFO' ? 'info' : logLine.level === 'WARN' ? 'warning' : 'error',
+      type: 'info',
       text: strings('Occurred at', logLine.timestamp)
     },
-    data: safeDump(logLine),
-    summary: {
-      content: logLine.message
-    },
-    modes,
-    involvedObject
-  }
+    modes
+  })
 }
 
 /**
  *
  *
  */
-export function formatAsTable(raw: string, args?: Commands.Arguments<KubeOptions>): Table {
+export async function formatAsTable(raw: string, args?: Commands.Arguments<KubeOptions>): Promise<Table> {
   const name = args.argvNoOptions[args.argvNoOptions.indexOf('logs') + 1]
   const namespace = (args && getNamespace(args)) || 'default'
   const kindMatch = name.match(/(\w+)\//)
@@ -191,42 +168,44 @@ export function formatAsTable(raw: string, args?: Commands.Arguments<KubeOptions
 
   return {
     header,
-    body: logLines.map(logLine => {
-      const attributes: Cell[] = []
+    body: await Promise.all(
+      logLines.map(async logLine => {
+        const attributes: Cell[] = []
 
-      attributes.push({
-        tag: 'badge',
-        value: logLine.level,
-        css: formatLevel(logLine)
-      })
+        attributes.push({
+          tag: 'badge',
+          value: logLine.level,
+          css: formatLevel(logLine)
+        })
 
-      if (logLine.detail1) {
-        attributes.push({ value: logLine.detail1 })
-      }
+        if (logLine.detail1) {
+          attributes.push({ value: logLine.detail1 })
+        }
 
-      if (logLine.detail2) {
-        attributes.push({ value: logLine.detail2 })
-      }
+        if (logLine.detail2) {
+          attributes.push({ value: logLine.detail2 })
+        }
 
-      attributes.push({
-        value: logLine.message,
-        css: 'somewhat-smaller-text pre-wrap slightly-deemphasize hide-with-sidecar'
-      })
+        attributes.push({
+          value: logLine.message,
+          css: 'somewhat-smaller-text pre-wrap slightly-deemphasize hide-with-sidecar'
+        })
 
-      /* if (logLine.messageDetail) {
+        /* if (logLine.messageDetail) {
         const value =
           Object.keys(logLine.messageDetail).length === 0 ? '' : JSON.stringify(logLine.messageDetail, undefined, 2)
         attributes.push({ value: value, css: 'smaller-text pre-wrap break-all sub-text' })
       } */
 
-      return {
-        name: logLine.timestamp || logLine.message,
-        outerCSS: 'not-a-name',
-        onclick: showLogEntry(logLine, { involvedObject }),
-        tag: 'div',
-        attributes
-      }
-    })
+        return {
+          name: logLine.timestamp || logLine.message,
+          outerCSS: 'not-a-name',
+          onclick: await showLogEntry(logLine, { involvedObject }),
+          tag: 'div',
+          attributes
+        }
+      })
+    )
   }
 }
 
@@ -235,6 +214,6 @@ export function formatAsTable(raw: string, args?: Commands.Arguments<KubeOptions
  * its raw log data
  *
  */
-export default function renderLogs(tab: Tab, resource: KubeResource): Table {
+export default function renderLogs(tab: Tab, resource: KubeResource): Promise<Table> {
   return formatAsTable(resource.data)
 }
