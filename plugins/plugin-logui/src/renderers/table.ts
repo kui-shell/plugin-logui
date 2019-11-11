@@ -146,6 +146,7 @@ export async function formatAsTable(raw: string, args?: Commands.Arguments<KubeO
   }
 
   const logLines = formats.map(tryParse(raw)).filter(_ => _.length > 0)[0]
+  const anyStructure = !!logLines.find(_ => _.timestamp)
 
   // headers
   const level = [{ value: strings('Level') }]
@@ -158,16 +159,22 @@ export async function formatAsTable(raw: string, args?: Commands.Arguments<KubeO
 
   const message = [{ value: strings('Message'), css: 'hide-with-sidecar' }]
 
-  const header = {
-    name: strings('Timestamp'),
-    attributes: level
-      .concat(detail1)
-      .concat(detail2)
-      .concat(message)
-  }
+  const header = !anyStructure
+    ? {
+        name: strings('Message'),
+        attributes: level.concat(detail1).concat(detail2)
+      }
+    : {
+        name: strings('Timestamp'),
+        attributes: level
+          .concat(detail1)
+          .concat(detail2)
+          .concat(message)
+      }
 
   return {
     header,
+    noSort: true,
     body: await Promise.all(
       logLines.map(async logLine => {
         const attributes: Cell[] = []
@@ -186,10 +193,12 @@ export async function formatAsTable(raw: string, args?: Commands.Arguments<KubeO
           attributes.push({ value: logLine.detail2 })
         }
 
-        attributes.push({
-          value: logLine.message,
-          css: 'somewhat-smaller-text pre-wrap slightly-deemphasize hide-with-sidecar'
-        })
+        if (logLine.timestamp) {
+          attributes.push({
+            value: logLine.message,
+            css: 'somewhat-smaller-text pre-wrap slightly-deemphasize hide-with-sidecar'
+          })
+        }
 
         /* if (logLine.messageDetail) {
         const value =
@@ -200,7 +209,7 @@ export async function formatAsTable(raw: string, args?: Commands.Arguments<KubeO
         return {
           name: logLine.timestamp || logLine.message,
           outerCSS: 'not-a-name',
-          onclick: await showLogEntry(logLine, { involvedObject }),
+          onclick: logLine.messageDetail && (await showLogEntry(logLine, { involvedObject })),
           tag: 'div',
           attributes
         }
