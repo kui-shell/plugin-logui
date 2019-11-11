@@ -27,7 +27,7 @@ import scopeBadge from './modes/scope-badge'
 
 export default async () => {
   if (!isHeadless()) {
-    // const { registerBadge, registerMode } = await import('@kui-shell/core/api/registrars')
+    const { registerBadge, registerMode } = await import('@kui-shell/core/api/registrars')
     registerMode(logs)
     registerMode(previous)
     registerMode(stackTrace)
