@@ -20,9 +20,11 @@ export default {
   pattern: /\n/,
   nColumns: 1,
   entry: (match: string[]): LogEntry => {
-    return {
-      level: 'INFO',
-      message: match[0]
-    }
+    return !match[0]
+      ? undefined
+      : {
+          level: 'INFO',
+          message: match[0]
+        }
   }
 }
