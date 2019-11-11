@@ -103,16 +103,7 @@ async function showLogEntry(
   logLine: LogEntry,
   involvedObject: InvolvedObject
 ): Promise<MultiModalResponse<LogEntryResource>> {
-  const modes = logLine.messageDetail
-    ? [
-        {
-          mode: 'details',
-          label: strings('Details'),
-          content: JSON.stringify(logLine.messageDetail, undefined, 2),
-          contentType: 'json'
-        }
-      ]
-    : []
+  const modes = []
 
   return Object.assign(await resourceFromLogEntry(logLine, involvedObject), {
     toolbarText: {

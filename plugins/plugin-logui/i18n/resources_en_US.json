@@ -6,5 +6,7 @@
   "Level": "Level",
   "Message": "Message",
   "Details": "Details",
-  "Occurred at": "Occurred at {0}"
+  "Occurred at": "Occurred at {0}",
+  "Stack Trace": "Stack Trace",
+  "Error": "Error"
 }

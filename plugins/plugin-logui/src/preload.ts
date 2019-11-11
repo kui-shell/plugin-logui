@@ -19,6 +19,8 @@ import { isHeadless } from '@kui-shell/core/api/capabilities'
 import logs from './modes/logs'
 import previous from './modes/previous'
 import levelBadge from './modes/level-badge'
+import stackTrace from './modes/stack-trace'
+import errorVerbose from './modes/error-verbose'
 import drilldownToLogs from './modes/show-logs'
 
 export default async () => {
@@ -26,6 +28,8 @@ export default async () => {
     const { registerBadge, registerMode } = await import('@kui-shell/core/api/registrars')
     registerMode(logs)
     registerMode(previous)
+    registerMode(stackTrace)
+    registerMode(errorVerbose)
     registerMode(drilldownToLogs)
 
     registerBadge(levelBadge)
