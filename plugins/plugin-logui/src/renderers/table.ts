@@ -200,7 +200,9 @@ export async function formatAsTable(raw: string, args?: Commands.Arguments<KubeO
         return {
           name: logLine.timestamp || logLine.message,
           outerCSS: 'not-a-name',
-          onclick: logLine.messageDetail && (await showLogEntry(logLine, { involvedObject })),
+          onclick:
+            (logLine.messageDetail || logLine.detail1 || logLine.detail2) &&
+            (await showLogEntry(logLine, { involvedObject })),
           tag: 'div',
           attributes
         }

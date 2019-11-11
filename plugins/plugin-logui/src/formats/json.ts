@@ -31,19 +31,25 @@ export default {
     try {
       const record = JSON.parse(line)
 
+      const base = {
+        level: record.level.toUpperCase() as LogLevel,
+        timestamp: new Date(1000 * parseFloat(record.ts)).toLocaleString(),
+        detail1: record.logger,
+        detail1Key: strings('Logger'),
+        message: record.msg
+      }
+
       const rest = Object.assign({}, record)
       delete rest.level
       delete rest.logger
       delete rest.msg
       delete rest.ts
-
-      return {
-        level: record.level.toUpperCase() as LogLevel,
-        timestamp: new Date(1000 * parseFloat(record.ts)).toLocaleString(),
-        detail1: record.logger,
-        detail1Key: strings('Logger'),
-        message: record.msg,
-        messageDetail: Object.keys(rest).length > 0 ? rest : {}
+      if (Object.keys(rest).length > 0) {
+        return Object.assign(base, {
+          messageDetail: rest
+        })
+      } else {
+        return base
       }
     } catch (err) {
       console.error('error parsing json', line, err)
