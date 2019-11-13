@@ -17,9 +17,8 @@
 import { i18n } from '@kui-shell/core/api/i18n'
 import { Tab, MultiModalResponse } from '@kui-shell/core/api/ui-lite'
 import { Table, Cell } from '@kui-shell/core/api/table-models'
-import Commands from '@kui-shell/core/api/commands'
 
-import { KubeOptions, getNamespace, KubeResource, InvolvedObject } from '@kui-shell/plugin-kubeui'
+import { KubeResource, InvolvedObject } from '@kui-shell/plugin-kubeui'
 
 import { LogEntry } from '../models/entry'
 import { LogEntryResource, resourceFromLogEntry } from '../models/resource'
@@ -118,9 +117,8 @@ async function showLogEntry(
  *
  *
  */
-export async function formatAsTable(raw: string, args?: Commands.Arguments<KubeOptions>): Promise<Table> {
-  const name = args.argvNoOptions[args.argvNoOptions.indexOf('logs') + 1]
-  const namespace = (args && getNamespace(args)) || 'default'
+export async function formatAsTable(raw: string, metadata: { name: string; namespace?: string }): Promise<Table> {
+  const { name, namespace = 'default' } = metadata
   const kindMatch = name.match(/(\w+)\//)
   const kindOfInvolved = kindMatch ? kindMatch[1] : 'pod'
   const apiVersionOfInvolved = /^deploy/i.test(kindOfInvolved)
@@ -217,5 +215,5 @@ export async function formatAsTable(raw: string, args?: Commands.Arguments<KubeO
  *
  */
 export default function renderLogs(tab: Tab, resource: KubeResource): Promise<Table> {
-  return formatAsTable(resource.data)
+  return formatAsTable(resource.data, resource.metadata)
 }

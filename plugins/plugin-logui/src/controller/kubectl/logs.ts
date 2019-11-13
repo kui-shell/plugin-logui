@@ -15,16 +15,23 @@
  */
 
 import Commands from '@kui-shell/core/api/commands'
-import { KubeOptions, doExecRaw, defaultFlags as flags } from '@kui-shell/plugin-kubeui'
+import { KubeOptions, doExecRaw, defaultFlags as flags, getNamespace } from '@kui-shell/plugin-kubeui'
 
 import commandPrefix from '../command-prefix'
 import { formatAsTable } from '../../renderers/table'
 
 async function doLogs(args: Commands.Arguments<KubeOptions>) {
-  return formatAsTable(await doExecRaw(args.command.replace(new RegExp(`^\\s*${commandPrefix}`), '')), args)
+  const name = args.argvNoOptions[args.argvNoOptions.indexOf('logs') + 1]
+  const namespace = (args && getNamespace(args)) || 'default'
+  return formatAsTable(await doExecRaw(args.command.replace(new RegExp(`^\\s*${commandPrefix}`), '')), {
+    name,
+    namespace
+  })
 }
 
-export default (registrar: Commands.Registrar) => {
-  registrar.listen(`/${commandPrefix}/kubectl/logs`, doLogs, flags)
-  registrar.listen(`/${commandPrefix}/k/logs`, doLogs, flags)
+export default async (registrar: Commands.Registrar) => {
+  await Promise.all([
+    registrar.override(`/${commandPrefix}/kubectl/logs`, 'plugin-kubeui', doLogs, flags),
+    registrar.override(`/${commandPrefix}/k/logs`, 'plugin-kubeui', doLogs, flags)
+  ])
 }

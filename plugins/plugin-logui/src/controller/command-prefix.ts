@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-export default 'logui'
+export default 'kubeui'
