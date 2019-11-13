@@ -21,7 +21,8 @@ import { LogEntryResource, isLogEntryResource } from '../models/resource'
 const strings = i18n('plugin-logui')
 
 /**
- * @return whether the given resource represents a list of logs
+ * @return whether the given `LogEntryResource` has a `stacktrace`
+ * property
  *
  */
 function hasStackTrace(resource: LogEntryResource): boolean {
