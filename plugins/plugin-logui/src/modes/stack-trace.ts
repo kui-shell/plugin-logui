@@ -32,6 +32,11 @@ function hasStackTrace(resource: LogEntryResource): boolean {
   )
 }
 
+/**
+ * This is the `content` function for the Stack Trace mode. It returns
+ * a bespoke HTMLElement.
+ *
+ */
 function renderStackTrace(tab: Tab, resource: LogEntryResource) {
   const rows = document.createElement('div')
   rows.classList.add('padding-content', 'smaller-text')
@@ -52,7 +57,7 @@ function renderStackTrace(tab: Tab, resource: LogEntryResource) {
 }
 
 /**
- * This is our mode model for the Logs tab of a Logs resource
+ * This is our mode model for the Stack Trace tab of a LogEntry resource
  *
  */
 export default {
